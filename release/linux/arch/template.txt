@@ -1,0 +1,16 @@
+# Maintainer: Pekka Järvinen
+pkgname=torjuja
+pkgver=%VERSION%
+pkgrel=1
+pkgdesc="Torjuja DNS query blocker"
+url="https://github.com/raspi/torjuja"
+license=('GPL')
+%CHECKSUM%
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  install -Dm644 "LICENSE" -t "$pkgdir/usr/share/licenses/$pkgname"
+  install -Dm644 "README.md" -t "$pkgdir/usr/share/doc/$pkgname"
+  install -Dm644 "%APPNAME%@.service" -t "$pkgdir/usr/lib/systemd/system/"
+  install -Dm755 "bin/%APPNAME%" -t "$pkgdir/usr/bin"
+}
