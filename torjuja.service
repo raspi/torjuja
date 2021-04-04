@@ -1,0 +1,12 @@
+[Unit]
+Description=Torjuja server
+Wants=network-pre.target
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/torjuja -config /etc/torjuja/config.json
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
