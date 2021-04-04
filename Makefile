@@ -84,6 +84,8 @@ copycommon:
 	@mkdir -p "$(RELEASETMPAPPDIR)/bin"
 	@cp -v "./LICENSE" "$(RELEASETMPAPPDIR)"
 	@cp -v "./README.md" "$(RELEASETMPAPPDIR)"
+	@cp -v "./config.json.dist" "$(RELEASETMPAPPDIR)"
+	@cp -v "./torjuja.service" "$(RELEASETMPAPPDIR)"
 	@mkdir --parents "$(PWD)/release/${VERSION}"
 
 # Compress files: FreeBSD
