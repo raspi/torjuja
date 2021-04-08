@@ -6,6 +6,8 @@
     <filePath value="$PROJECT_DIR$" />
     <package value="github.com/raspi/torjuja" />
     <directory value="$PROJECT_DIR$" />
-    <method v="2" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="build" run_configuration_type="js.build_tools.npm" />
+    </method>
   </configuration>
 </component>

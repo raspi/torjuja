@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/alexandrevicenzi/go-sse"
-	"github.com/go-chi/chi/v5"
-	mw "github.com/go-chi/chi/v5/middleware"
 	"github.com/miekg/dns"
 	"github.com/raspi/torjuja/pkg/db/iface"
-	"io"
+	"github.com/raspi/torjuja/pkg/httpapi/frontend"
 	"log"
 	"net"
 	"net/http"
@@ -89,10 +87,8 @@ type Service struct {
 	dnsClient         dns.Client // Generic DNS client for forwarder
 	forwarders        []string   // DNS query forwarders
 	errch             chan error
-	httpApi           *chi.Mux
 	httpApiListenAddr string
 	db                iface.Database
-	sseServer         *sse.Server
 	bogusIPv4         net.IP // A
 	bogusIPv6         net.IP // AAAA
 	bogusTTL          uint32 // Seconds
@@ -100,6 +96,7 @@ type Service struct {
 	blockLogger       *log.Logger
 	allowLogger       *log.Logger
 	logger            *log.Logger
+	httpfrontend      *frontend.Server
 }
 
 func New(dnsListenAddresses []string, blocked Blocked, ttl uint32, forwarders []string, db iface.Database, httpApiListen string, errch chan error) (s *Service, err error) {
@@ -131,37 +128,18 @@ func New(dnsListenAddresses []string, blocked Blocked, ttl uint32, forwarders []
 		errch:             errch,
 		httpApiListenAddr: httpApiListen,
 		db:                db,
-		sseServer: sse.NewServer(&sse.Options{
-			RetryInterval: 5,
-			Logger:        log.New(os.Stdout, `SSE: `, 0),
-		}),
+		httpfrontend:      frontend.New(db),
 	}
-
-	apirouter := chi.NewRouter()
-	apirouter.Post(`/allow`, s.apiAllow)
-
-	router := chi.NewRouter()
-	router.Use(mw.RequestID)
-	router.Use(mw.Logger)
-	router.Use(mw.Recoverer)
-	router.Use(mw.URLFormat)
-
-	router.Mount(`/api/v1`, apirouter)
-
-	// SSE for blocked events
-	router.Handle(`/events/blocked`, s.sseServer)
-
-	s.httpApi = router
 
 	for _, dnsserver := range dnsListenAddresses {
 		mux := dns.NewServeMux()
-		mux.HandleFunc(`.`, s.handleDNSReq)
+		mux.HandleFunc(`.`, s.handleDNSReq) // Catch-all
 
 		dnssrv := &dns.Server{
 			Addr:      dnsserver,
 			Net:       "udp",
 			Handler:   mux,
-			ReusePort: false,
+			ReusePort: true,
 		}
 
 		s.dnsListenServers = append(s.dnsListenServers, dnssrv)
@@ -170,15 +148,9 @@ func New(dnsListenAddresses []string, blocked Blocked, ttl uint32, forwarders []
 	return s, nil
 }
 
-// apiAllow is a Service.httpApi HTTP handler for allowing DNS queries to Service.db that allows DNS query access
-func (s *Service) apiAllow(writer http.ResponseWriter, request *http.Request) {
-	_, _ = io.WriteString(writer, `TODO`)
-}
-
 func (s *Service) Listen() error {
 	go func(errs chan error) {
-
-		if err := http.ListenAndServe(s.httpApiListenAddr, s.httpApi); err != nil {
+		if err := http.ListenAndServe(s.httpApiListenAddr, s.httpfrontend.GetRouter()); err != nil {
 			errs <- StartupFailureError(err)
 		}
 	}(s.errch)
@@ -206,7 +178,7 @@ func (s *Service) allowLog(name string, t string) {
 
 func (s *Service) blockLog(name string, t string) {
 	s.blockLogger.Printf(`%s %s`, t, name)
-	s.sseServer.SendMessage(`/events/blocked`, sse.NewMessage(``, name, t))
+	s.httpfrontend.SendMessage(`/events/blocked`, sse.SimpleMessage(fmt.Sprintf(`%s %s`, t, name)))
 }
 
 // allowedA checks Service.db for allowed DNS query

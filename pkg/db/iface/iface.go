@@ -7,9 +7,9 @@ type Allowed interface {
 }
 
 type AllowAPI interface {
-	AllowA(name string) error
-	AllowAAAA(name string) error
-	AllowPTR(name string) error
+	AllowA(name string) error    // IPv4
+	AllowAAAA(name string) error // IPv6
+	AllowPTR(name string) error  // Reverse
 }
 
 type Database interface {

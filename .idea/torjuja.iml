@@ -12,6 +12,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/release/linux/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/release/linux/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/frontend/.vscode" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
