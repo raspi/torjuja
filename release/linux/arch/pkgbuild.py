@@ -48,7 +48,7 @@ if __name__ == '__main__':
         os.path.join('..', '..', 'v' + args.version)
     ).glob('*.shasums'))[0]
 
-    files:dict = {}
+    files: dict = {}
 
     with open(checksumsfile, encoding='utf8') as f:
         for i in f:
@@ -74,7 +74,7 @@ if __name__ == '__main__':
                 'arch': arch,
             }
 
-    checksumtpl:str = ""
+    checksumtpl: str = ""
 
     with io.StringIO() as f:
         archlist = []
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
         checksumtpl = f.getvalue()
 
-    tpl:str = ""
+    tpl: str = ""
 
     with open('template.txt', 'r', encoding='utf8') as f:
         tpl = f.read()
