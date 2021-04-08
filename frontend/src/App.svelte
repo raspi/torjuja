@@ -1,22 +1,6 @@
 <script lang="ts">
-    import {AllowDTO} from './dto'
-
-    async function formSubmit(evt) {
-        let dto = new AllowDTO()
-        dto.fqdn = evt.target.fqdn.value
-
-        const response = await fetch("/api/v1/allow", {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dto)
-        });
-
-        const data = await response.json();
-        console.log(data)
-    }
+    import Footer from './Footer.svelte'
+    import AllowForm from './AllowForm.svelte'
 
     const blockedEventsURL = '/events/blocked'
     let sseEvents: EventSource = new EventSource(blockedEventsURL)
@@ -38,12 +22,8 @@
 </script>
 
 <main>
-    <form action="#" method="post" on:submit|preventDefault={formSubmit}>
-        <label for="fqdn">Allow</label>
-        <input id="fqdn" type="text" value="">
-        <label for="submit">Submit</label>
-        <input id="submit" type="submit" value="Send">
-    </form>
+
+    <AllowForm/>
 
     <table>
         <thead>
@@ -55,6 +35,8 @@
         </tbody>
     </table>
 </main>
+
+<Footer/>
 
 <style>
 </style>
