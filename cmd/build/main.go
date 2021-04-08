@@ -12,6 +12,7 @@ func main() {
 	converter := typescriptify.New()
 	converter.CreateFromMethod = false
 	converter.DontExport = false
+	converter.BackupDir = ``
 
 	converter.Add(frontend.AllowDTO{})
 	converter.Add(frontend.ResponseDTO{})
