@@ -1,5 +1,6 @@
 <script lang="ts">
     import {AllowDTO} from './dto'
+    import Form from "./form/Form.svelte";
 
     async function formSubmit(evt) {
         let errorTarget = document.querySelectorAll('div.errors ul')
@@ -8,7 +9,7 @@
         })
 
         let dto = new AllowDTO()
-        dto.fqdn = evt.target.fqdn.value
+        dto.fqdn = evt.fqdn
 
         if (dto.fqdn === '') {
             await addError('empty')
@@ -52,6 +53,17 @@
         })
     }
 
+    //   Our field representation, let's us easily specify several inputs
+    let fields = [
+        {
+            name: "fqdn",
+            type: "Input",
+            value: "",
+            placeholder: "FQDN...",
+            label: "FQDN",
+        }
+    ]
+
 </script>
 
 <h2>Allow</h2>
@@ -60,18 +72,7 @@
     <ul></ul>
 </div>
 
-<form action="#" method="post" on:submit|preventDefault={formSubmit}>
-    <table>
-        <tr>
-            <td><label for="fqdn">Allow</label></td>
-            <td><input id="fqdn" type="text" value=""></td>
-        </tr>
-        <tr>
-            <td><label for="submit">Submit</label></td>
-            <td><input id="submit" type="submit" value="Send"></td>
-        </tr>
-    </table>
-</form>
+<Form onSubmit={formSubmit} {fields}/>
 
 <div class="errors">
     <ul></ul>
