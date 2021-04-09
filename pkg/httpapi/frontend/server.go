@@ -74,6 +74,8 @@ func (srv Server) assets(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Add(`Content-Type`, `text/css`)
 	case `png`:
 		writer.Header().Add(`Content-Type`, `image/png`)
+	case `map`:
+		writer.Header().Add(`Content-Type`, `application/json`)
 	default:
 		writer.WriteHeader(http.StatusForbidden)
 		return
