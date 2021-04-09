@@ -36,6 +36,9 @@ func New(db iface.AllowAPI) (s *Server) {
 	}
 
 	apirouter := chi.NewRouter()
+	apirouter.Use(SetContentTypeMiddleware(`application/json; charset=UTF-8`))
+	apirouter.Use(mw.AllowContentType(`application/json`))
+
 	apirouter.Post(`/allow`, s.apiAllow)
 
 	router := chi.NewRouter()
@@ -189,4 +192,13 @@ func (srv *Server) apiAllow(writer http.ResponseWriter, request *http.Request) {
 
 func (srv *Server) SendMessage(s string, message *sse.Message) {
 	srv.sseServer.SendMessage(s, message)
+}
+
+func SetContentTypeMiddleware(ct string) func(http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set(`Content-Type`, ct)
+			h.ServeHTTP(w, r)
+		})
+	}
 }
