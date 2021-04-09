@@ -3,3 +3,6 @@ release/v*.*.*
 /venv/
 config.json
 /frontend/node_modules/
+/frontend/public/assets/bundle.js.map
+/frontend/public/assets/bundle.js
+/frontend/public/assets/bundle.css
